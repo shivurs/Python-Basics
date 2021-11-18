@@ -9,3 +9,5 @@ while check < 10:
     print(password)
     print(len(password))
     check += 1
+
+print('done')
