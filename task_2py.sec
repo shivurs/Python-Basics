@@ -1,0 +1,39 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
+
+"""Programming for Computational Linguistics
+   Week 2: Flow Control
+   Task 2: while statement
+"""
+
+## TASK 2
+# Ask the user to give a size 'n' between 1 and 20
+# (ask for it until the user gives a correct number).
+# Draw a square of size 'n' using characters '#'.
+# For example, for n=5 you should print to console:
+
+# # # # #
+# # # # #
+# # # # #
+# # # # #
+# # # # #
+
+
+# After drawing the square the program should finish.
+while True:
+   print('Give the size of the square')
+   n = int(input())
+   if n < 1:
+      print('Too small')
+      continue
+   elif n > 20:
+      print('Too big')
+      continue
+   break
+
+print(('# '*n + "\n")*n)
+
+
+
+
+
