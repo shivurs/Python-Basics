@@ -1,7 +1,7 @@
 import positivity
 
-review = "The food was horrible!!! We waited 40 minutes for frozen vegetables and moldy bread. Disgusting!"
+review1 = "The food was horrible!!! We waited 40 minutes for frozen vegetables and moldy bread. Disgusting!"
+print(positivity.positivize(review1))
 
-#review = 'bad 50!!! Dirty rats!'
-
-print(positivity.positivize(review))
+review2 = 'Bad 50 minutes waiting!!! 12 beers!'
+print(positivity.positivize(review2))
