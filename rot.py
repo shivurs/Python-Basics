@@ -8,5 +8,8 @@ def rotated(lst, n):
     if len(lst) > 0:    
         num = n % len(lst)
         lst_new = shift(lst, num)
-        return lst_new
-    return lst
+    else:
+        #lst_new = lst      grader said must be new list
+        num = len(lst)
+        lst_new = shift(lst, num)
+    return lst_new
