@@ -21,21 +21,21 @@ badgoodup = {                             #dictionary of words to be replaced an
 }
 
 def halve_minutes(review):
-    review_list = review.split()
-    i = 0
-    while i < len(review_list):
-        check = review_list[i]
-        if i < (len(review_list) - 1):
-            next = review_list[i + 1]
-        else:
-            break
-        if check.isdigit() == True and next == 'minutes':   
-            review_list[i] = str((int(review_list[i]) // 2))
-            review_list.insert(i, 'only')
-            i += 1
-        i += 1
-    review = ' '.join(review_list)
-    return review
+    review_list = review.split()        # tokenize review
+    i = 0                               # start at 0
+    while i < len(review_list):         # iterate over the tokenized list
+        check = review_list[i]          # store the word at index i to be checked
+        if i < (len(review_list) - 1):  # if check is not the last word
+            next = review_list[i + 1]   # store the next word after check
+        else:                           # if check is last word
+            break                       # do nothing and exit the loop
+        if check.isdigit() == True and next == 'minutes':    # if check is a number and the next word is 'minutes'
+            review_list[i] = str((int(review_list[i]) // 2)) # divide the number by 2 with no remainder
+            review_list.insert(i, 'only')                    # insert 'only' before the number
+            i += 1                      # increase i inside loop
+        i += 1                          # increase i outside loop
+    review = ' '.join(review_list)      # recombine all the words into a new string
+    return review                       # return the new string
 
 def positivize(review):
     review = str(review)
