@@ -12,25 +12,30 @@ def lowerlst(lst):
     return lst
 
 def clean(line):
-    if line == '\n':            #if it's only a new line, 
-        return None             #return None
-    first = line.split('_')     #split the line by underscores    
-    first[0] = first[0].strip() #strip the first element by tabs/spaces
-    second = first[0].split('\t') #split the first element by tabs
-    first[1] = first[1].strip() #strip the second element by tabs/spaces
-    result = (second[-1], first[1]) #create a tuple of the word and the POS tag
-    return result               #return the tuple
+    words = []
+    if line == '\n':                    #if it's only a new line, 
+        return None                     #return None
+    wordsInLine = line.split('\t')      #split the line by     
+    for word in wordsInLine:
+        if word == '':
+            continue
+        else:
+            words.append(word)
+        if len(words) > 3:
+            break
+    result = (words[1], words[3])       #create a tuple of the word and the POS tag
+    return result                       #return the tuple
 
 def read_conllu(filepath):
-    f = open(filepath, 'r')
-    poslst = []                 #start with an empty list
-    for line in f.readlines():  #look at each line of the file
-        tup = clean(line)       #get the word-POS tuples
-        if tup  == None:        #skip the new line chars
+    f = open(filepath, 'r', encoding='UTF8')
+    poslst = []                         #start with an empty list
+    for line in f.readlines():          #look at each line of the file
+        tup = clean(line)               #get the word-POS tuples
+        if tup  == None:                #skip the new line chars
             continue
-        poslst.append(tup)      #add the tuple to the list
+        poslst.append(tup)              #add the tuple to the list
     f.close()                   
-    return poslst               #return the list of tuples
+    return poslst                       #return the list of tuples
 
 def train_and_tag(train_file, test_words):
     tuplst = read_conllu(train_file)
@@ -43,6 +48,16 @@ def train_and_tag(train_file, test_words):
                 result.append(item[1])
                 is_in = True
                 break
-        if is_in == False:
-            result.append("UNK")
+        if is_in == False and 'http' in word:
+            result.append('X')
+        elif is_in == False:
+            word = word.capitalize()
+            for item in tuplst:
+                if word in item:
+                    result.append(item[1])
+                    is_in = True
+                    break
+            if is_in == False:
+                result.append("UNK")
     return result
+
