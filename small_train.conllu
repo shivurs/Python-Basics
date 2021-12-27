@@ -1,0 +1,40 @@
+1   The       _   DET   _ _ _ _ _ _
+2   hottest   _   ADJ   _ _ _ _ _ _
+3   item      _   NOUN  _ _ _ _ _ _
+4   on        _   ADP   _ _ _ _ _ _
+5   Christmas _   PROPN _ _ _ _ _ _
+6   wish      _   NOUN  _ _ _ _ _ _
+7   lists     _   NOUN  _ _ _ _ _ _
+8   this      _   DET   _ _ _ _ _ _
+9   year      _   NOUN  _ _ _ _ _ _
+10  is        _   AUX   _ _ _ _ _ _
+11  nuclear   _   ADJ   _ _ _ _ _ _
+12  weapons   _   NOUN  _ _ _ _ _ _
+13  .         _   PUNCT _ _ _ _ _ _
+
+1   This      _   PRON  _ _ _ _ _ _
+2   is        _   AUX   _ _ _ _ _ _
+3   unlike    _   ADP   _ _ _ _ _ _
+4   the       _   DET   _ _ _ _ _ _
+5   situation _   NOUN  _ _ _ _ _ _
+6   last      _   ADJ   _ _ _ _ _ _
+7   year      _   NOUN  _ _ _ _ _ _
+8   when      _   ADV   _ _ _ _ _ _
+9   we        _   PRON  _ _ _ _ _ _
+10  evacuated _   VERB  _ _ _ _ _ _
+11  citizens  _   NOUN  _ _ _ _ _ _
+
+1   From      _   ADP   _ _ _ _ _ _
+2   the       _   DET   _ _ _ _ _ _
+3   AP        _   PROPN _ _ _ _ _ _
+4   comes     _   VERB  _ _ _ _ _ _
+5   this      _   DET   _ _ _ _ _ _
+6   story     _   NOUN  _ _ _ _ _ _
+
+1   I         _   PRON  _ _ _ _ _ _
+2   wish      _   VERB  _ _ _ _ _ _
+3   you       _   PRON  _ _ _ _ _ _
+4   all       _   DET   _ _ _ _ _ _
+5   of        _   ADP   _ _ _ _ _ _
+6   the       _   DET   _ _ _ _ _ _
+7   best      _   ADJ   _ _ _ _ _ _
