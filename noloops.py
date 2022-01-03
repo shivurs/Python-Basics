@@ -14,7 +14,6 @@ def squares(nums):
     sq = 0
     sqlist = []
     if nums == []:
-        sqlist = nums
         return sqlist
     elif len(nums) == 1:
         sq = nums[0] * nums[0]
