@@ -24,4 +24,6 @@ sentence = [ ' S ' ,
 [ ' PUNCT ' , ' . ' ]
 ]
 
+sent =  ['S', ['NP', ['DT', 'a'], ['NN', 'fish']], ['VP', ['VB', 'slept']], ['PUNCT', '!']]
+
 print(list2parsetree(sentence))
