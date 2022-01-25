@@ -9,5 +9,5 @@ def list2parsetree(l):
         else:                           #if the second item is a list, it's a phrase
             inphrase = list2parsetree(ele)  #check for more tokens as before
             children.append(inphrase)   #add new tokens
-    phrase = Phrase(l[0], children)   #assemble phrase
-    return phrase
+    phrase = Phrase(l[0], children)     #assemble phrase
+    return phrase                       #as it pops back out, it assembles the sentence
