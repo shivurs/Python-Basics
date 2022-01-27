@@ -1,0 +1,154 @@
+1,Afghanistan,3.632,Asia
+2,Albania,4.586,Europe
+3,Algeria,5.295,Africa
+4,Angola,3.795,Africa
+5,Argentina,6.388,Latin America and Caribbeans
+6,Armenia,4.321,Europe
+7,Australia,7.272,Oceania
+8,Austria,7.139,Europe
+9,Azerbaijan,5.201,Europe
+10,Bahrain,6.105,Asia
+11,Bangladesh,4.500,Asia
+12,Belarus,5.483,Europe
+13,Belgium,6.927,Europe
+14,Belize,5.956,Latin America and Caribbeans
+15,Benin,4.141,Africa
+16,Bhutan,5.082,Asia
+17,Bolivia,5.752,Latin America and Caribbeans
+18,Bosnia and Herzegovina,5.129,Europe
+19,Botswana,3.590,Africa
+20,Brazil,6.419,Latin America and Caribbeans
+21,Bulgaria,4.933,Europe
+22,Burkina Faso,4.424,Africa
+23,Burundi,2.905,Africa
+24,Cambodia,4.433,Asia
+25,Cameroon,4.975,Africa
+26,Canada,7.328,North America
+27,Central African Republic,3.083,Africa
+28,Chad,4.301,Africa
+29,Chile,6.476,Latin America and Caribbeans
+30,China,5.246,Asia
+31,Colombia,6.260,Latin America and Caribbeans
+32,Costa Rica,7.072,Latin America and Caribbeans
+33,Croatia,5.321,Europe
+34,Cyprus,5.762,Europe
+35,Czech Republic,6.711,Europe
+36,Democratic Republic of the Congo,4.245,Africa
+37,Denmark,7.555,Europe
+38,Dominican Republic,5.302,Latin America and Caribbeans
+39,Ecuador,5.973,Latin America and Caribbeans
+40,Egypt,4.419,Africa
+41,El Salvador,6.167,Latin America and Caribbeans
+42,Estonia,5.739,Europe
+43,Ethiopia,4.350,Africa
+44,Finland,7.632,Europe
+45,France,6.489,Europe
+46,Gabon,4.758,Africa
+47,Georgia,4.340,Europe
+48,Germany,6.965,Europe
+49,Ghana,4.657,Africa
+50,Greece,5.358,Europe
+51,Guatemala,6.382,Latin America and Caribbeans
+52,Guinea,3.964,Africa
+53,Haiti,3.582,Latin America and Caribbeans
+54,Honduras,5.504,Latin America and Caribbeans
+55,Hong Kong,5.430,Asia
+56,Hungary,5.620,Europe
+57,Iceland,7.495,Europe
+58,India,4.190,Asia
+59,Indonesia,5.093,Asia
+60,Iran,4.707,Asia
+61,Iraq,4.456,Asia
+62,Ireland,6.977,Europe
+63,Israel,7.190,Asia
+64,Italy,6.000,Europe
+65,Ivory Coast,4.671,Africa
+66,Jamaica,5.890,Latin America and Caribbeans
+67,Japan,5.915,Asia
+68,Jordan,5.161,Asia
+69,Kazakhstan,5.790,Asia
+70,Kenya,4.410,Africa
+71,Kosovo,5.662,Europe
+72,Kuwait,6.083,Asia
+73,Kyrgyzstan,5.131,Asia
+74,Laos,4.623,Asia
+75,Latvia,5.933,Europe
+76,Lebanon,5.199,Asia
+77,Lesotho,3.808,Africa
+78,Liberia,3.495,Africa
+79,Libya,5.566,Africa
+80,Lithuania,5.952,Europe
+81,Luxembourg,6.910,Europe
+82,Macedonia,5.185,Europe
+83,Madagascar,3.774,Africa
+84,Malawi,3.587,Africa
+85,Malaysia,6.322,Asia
+86,Mali,4.447,Africa
+87,Malta,6.627,Europe
+88,Mauritania,4.356,Africa
+89,Mauritius,5.891,Africa
+90,Mexico,6.488,Latin America and Caribbeans
+91,Moldova,5.640,Europe
+92,Mongolia,5.125,Asia
+93,Montenegro,5.347,Europe
+94,Morocco,5.254,Africa
+95,Mozambique,4.417,Africa
+96,Myanmar,4.308,Asia
+97,Namibia,4.441,Africa
+98,Nepal,4.880,Asia
+99,Netherlands,7.441,Europe
+100,New Zealand,7.324,Oceania
+101,Nicaragua,6.141,Latin America and Caribbeans
+102,Niger,4.166,Africa
+103,Nigeria,5.155,Africa
+104,Norway,7.594,Europe
+105,Pakistan,5.472,Asia
+106,Panama,6.430,Latin America and Caribbeans
+107,Paraguay,5.681,Latin America and Caribbeans
+108,Peru,5.663,Latin America and Caribbeans
+109,Philippines,5.524,Asia
+110,Poland,6.123,Europe
+111,Portugal,5.410,Europe
+112,Qatar,6.374,Asia
+113,Republic of the Congo,4.559,Africa
+114,Romania,5.945,Europe
+115,Russia,5.810,Europe
+116,Rwanda,3.408,Africa
+117,Saudi Arabia,6.371,Asia
+118,Senegal,4.631,Africa
+119,Serbia,5.398,Europe
+120,Sierra Leone,4.571,Africa
+121,Singapore,6.343,Asia
+122,Slovakia,6.173,Europe
+123,Slovenia,5.948,Europe
+124,Somalia,4.982,Africa
+125,South Africa,4.724,Africa
+126,South Korea,5.875,Asia
+127,South Sudan,3.254,Africa
+128,Spain,6.310,Europe
+129,Sri Lanka,4.471,Asia
+130,Sudan,4.139,Africa
+131,Sweden,7.314,Europe
+132,Switzerland,7.487,Europe
+133,Syria,3.462,Asia
+134,Taiwan,6.441,Asia
+135,Tajikistan,5.358,Asia
+136,Tanzania,3.303,Africa
+137,Thailand,6.072,Asia
+138,Togo,3.999,Africa
+139,Trinidad and Tobago,6.192,Latin America and Caribbeans
+140,Tunisia,4.592,Africa
+141,Turkey,5.483,Europe
+142,Turkmenistan,5.636,Asia
+143,Uganda,4.161,Africa
+144,Ukraine,4.103,Europe
+145,United Arab Emirates,6.774,Asia
+146,United Kingdom,6.814,Europe
+147,United States,6.886,North America
+148,Uruguay,6.379,Latin America and Caribbeans
+149,Uzbekistan,6.096,Asia
+150,Venezuela,4.806,Latin America and Caribbeans
+151,Vietnam,5.103,Asia
+152,Yemen,3.355,Asia
+153,Zambia,4.377,Africa
+154,Zimbabwe,3.692,Africa
