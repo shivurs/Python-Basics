@@ -1,6 +1,7 @@
 def find_happiest(filename):
     results = {}
-    for line in open(filename, 'r'):
+    file = open(filename, 'r')
+    for line in file:
         line = line.strip('\n')
         line = line.split(',')
         continent = line[3]
@@ -10,7 +11,7 @@ def find_happiest(filename):
             results[continent] = [country, score]
         elif continent in results and score > results[continent][1]:
             results[continent] = [country, score]
-    # Error closing file
+    file.close()
     return results
 
 
