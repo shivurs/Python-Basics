@@ -11,4 +11,4 @@ def build_headline(text):
         for l in charlist:
             headline += l[row]
         headline += '\n'
-    return headline
+    return headline.strip('\n')
