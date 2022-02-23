@@ -27,18 +27,15 @@ Calpurnia!
 Here, my lord."""
 
 text3 = """Why dost thou with thy best apparel on? you, sir, cobble you.
-Where you perceive them thick. these growing feathers pluck'd from caesar's wing will make him fly 
-an ordinary pitch, who else would soar above the view of men and keep us all in servile fearfulness."""
+Where you perceive them thick. these growing feathers pluck'd from caesar's wing will make him fly an ordinary pitch, who else would soar above the view of men and keep us all in servile fearfulness."""
 
 tokens1 = corpus.tokenize(text1)
 tokens2 = corpus.tokenize(text2)
 tokens3 = corpus.tokenize(text3)
+test_text = 'answer me cat, answer me that.'
 
-lang = lm.LanguageModel(4)
-#print(lang.p_next(['sos']))
+lang = lm.LanguageModel(2)
 lang.train(tokens1 + tokens2 + tokens3)
-print(lang.generate())
-# print(lang.make_n_probs(text3))
-# print(lang.get_perplexity_score(text3))
-# print(lang.most_common_token())
-# print(lang.most_common_gram())
+generated = lang.greedy_generate()
+print(generated)
+print(lang.get_perplexity_score(generated))
