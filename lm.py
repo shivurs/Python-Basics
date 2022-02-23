@@ -11,6 +11,7 @@ class LanguageModel:
         self.gram_list = []
         self.gram_counts = {}
         self.start_words = {}
+        self.common_word = ''
 
     def train(self, token_sequences): 
         self.token_list = token_sequences
@@ -142,7 +143,7 @@ class LanguageModel:
         return copy
 
     def append_next(self, eos, sample):
-        """Add words to list until \n is encountered or the dict is empty.
+        """Add words to list until eos is encountered or the dict is empty.
         The last n words are fed back into p_next to create the sample dictionary.
         """
         line = []
@@ -159,14 +160,24 @@ class LanguageModel:
             sample = line[-self.n:]
         return line
 
-    def most_common_token(self):
+    def most_common_word(self):
         """Return the most common token of the text and the quantity."""
-        most_common = ''
+        leave_out = set([',','.','!','\n'])
         checked = 0
         for key in self.token_counts:
-            if self.token_counts[key] > checked:
+            if key not in leave_out and self.token_counts[key] > checked:
                 checked = self.token_counts[key]
-                most_common = key
+                self.common_word = key
+        result = f'\'{self.common_word}\' occurs {checked} times.'
+        return result
+
+    def most_common_word_gram(self):
+        most_common = ()
+        checked = 0
+        for gram in self.gram_counts:
+            if self.common_word == gram[0] and self.gram_counts[gram] > checked:
+                checked = checked = self.gram_counts[gram]
+                most_common = gram
         result = f'{most_common} occurs {checked} times.'
         return result
 
@@ -205,25 +216,26 @@ class LanguageModel:
     
     def get_smooth_probs(self, test_tokens):
         probs_list = []
-        sequence = ['sos']
+        sequence = test_tokens[1:self.n +1]
         prob = 0
-        for token in test_tokens[1:]:
+        for i in range(1,len(test_tokens) - self.n):
             sequence = sequence[-self.n:]
             next_dict = self.find_next(sequence)
             probs_dict = self.calc_smooth_probs(next_dict)
-            if token in probs_dict:  
-                prob = probs_dict[token]
+            next = test_tokens[i + self.n]
+            if next in probs_dict:  
+                prob = probs_dict[next]
             else:
                 prob = probs_dict['UNK']
             probs_list.append(prob)
-            sequence.append(token)
+            sequence.append(next)
         return probs_list
 
-    def calc_perplexity(self, smooth_probs):
+    def calc_perplexity(self, probs_list):
         """Calculate arithmetic mean of log probabilities from list."""
         score = 0
         log_list = []
-        for prob in smooth_probs:
+        for prob in probs_list:
             log_prob = math.log(prob)
             log_list.append(log_prob)
         for prob in log_list:
@@ -232,10 +244,48 @@ class LanguageModel:
         score = math.exp(score)
         return score 
 
-    def get_perplexity_score(self, test_text):
+    def get_smooth_perplexity(self, test_text):
         test_tokens = corpus.tokenize(test_text)
         self.add_oov_tokens(test_tokens) # 1. store OOV in UNK token # 2. count # of UNKs
         smooth_probs = self.get_smooth_probs(test_tokens) # 3. calc smooth probabilities (V = # UNKs)
         score = self.calc_perplexity(smooth_probs) # 4. calc perplexity        
         return score
+
+    def get_probs_list(self, new_tokens):
+        """Create list of probabilities from p_next dictionaries."""
+        probs_list = []
+        sequence = new_tokens[1:self.n +1]
+        prob = 0
+        for i in range(1,len(new_tokens) - self.n):
+            sequence = sequence[-self.n:]
+            probs_dict = self.p_next(sequence)
+            next = new_tokens[i + self.n]
+            if next in probs_dict:  
+                prob = probs_dict[next]
+            probs_list.append(prob)
+            sequence.append(next)
+        return probs_list
         
+    def get_perplexity_score(self, generated):
+        new_tokens = corpus.tokenize(generated)
+        probs = self.get_probs_list(new_tokens)
+        score = self.calc_perplexity(probs)
+        return score
+
+    def get_highest_one(self, dict):
+        high_key = ''
+        prob = 0
+        for key in dict:
+            if dict[key] > prob:
+                high_key = key
+        return high_key
+
+    def greedy_generate(self):
+        eos = '\n'
+        next = ''
+        line = [self.get_sample_start()]
+        while next != eos:
+            next = self.get_highest_one(self.p_next(line[-self.n:]))
+            line.append(next)
+        generated = corpus.detokenize(line)
+        return generated
