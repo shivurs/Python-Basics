@@ -42,18 +42,20 @@ def trainlm():
     root.lang.train(tokens)
     num = len(root.lang.token_list)
     num_tokens = f'The number of tokens is {num}'
-    most_token = f'The most common token {root.lang.most_common_token()}'
+    most_token = f'The most common word {root.lang.most_common_word()}'
     most_gram = f'The most common {n}-gram {root.lang.most_common_gram()}'
+    most_word_gram = f'The most common {n}-gram starting with \'{root.lang.common_word}\' {root.lang.most_common_word_gram()}'
     Label(root, text=num_tokens).grid(row=6, columnspan=2)
     Label(root, text=most_token).grid(row=7, columnspan=2)
     Label(root, text=most_gram).grid(row=8, columnspan=2)
+    Label(root, text=most_word_gram).grid(row=9, columnspan=2)
 
 Button(root, text="Train and Display Info", command=trainlm, bg="#caced1").grid(row=5, column=1)
 
-Label(root, text=instructions3).grid(row=9, columnspan=2)
-Label(root, text=information3).grid(row=10, columnspan=2)
+Label(root, text=instructions3).grid(row=10, columnspan=2)
+Label(root, text=information3).grid(row=11, columnspan=2)
 gen_input = Entry(root, border=5)
-gen_input.grid(row=11, column=0)
+gen_input.grid(row=12, column=0)
 
 def generate():
     top = Toplevel()
@@ -65,7 +67,7 @@ def generate():
         Label(top, text=lines, wraplength=750).pack()
         root.to_be_saved += lines
     
-    #root.perplexity = lang.get_perplexity_score(root.to_be_saved)
+    root.perplexity = root.lang.get_perplexity_score(root.to_be_saved)
 
     Button(top, text="Save to File", command=save, bg="#caced1").pack()
     Button(top, text="Close Window", command=top.destroy, bg="#caced1").pack()
@@ -76,12 +78,12 @@ def save():
     root.save_file.close()
 
 def perplex():
-    Label(root, text=str(root.perplexity)).grid(row=12, column=1)
+    Label(root, text=str(root.perplexity)).grid(row=13, column=1)
     
-Button(root, text="Generate Text", command=generate, bg="#caced1").grid(row=11, column=1)
+Button(root, text="Generate Text", command=generate, bg="#caced1").grid(row=12, column=1)
 
-#Button(root, text="See Perplexity", command=perplex, bg="#caced1").grid(row=12, column=0)
+Button(root, text="See Perplexity", command=perplex, bg="#caced1").grid(row=13, column=0)
 
-Button(root, text="Close Program", command=exit, bg="#caced1").grid(row=13, columnspan=2)
+Button(root, text="Close Program", command=exit, bg="#caced1").grid(row=14, columnspan=2)
 
 root.mainloop()
