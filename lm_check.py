@@ -1,3 +1,4 @@
+from torch import greater_equal
 import corpus
 import lm
 
@@ -26,16 +27,27 @@ Peace, ho! Caesar speaks.
 Calpurnia!
 Here, my lord."""
 
-text3 = """Why dost thou with thy best apparel on? you, sir, cobble you.
-Where you perceive them thick. these growing feathers pluck'd from caesar's wing will make him fly an ordinary pitch, who else would soar above the view of men and keep us all in servile fearfulness."""
-
 tokens1 = corpus.tokenize(text1)
 tokens2 = corpus.tokenize(text2)
-tokens3 = corpus.tokenize(text3)
-test_text = 'answer me cat, answer me that.'
+test_text = '''Answer me directly.
+Hence! home, you idle
+'''
 
-lang = lm.LanguageModel(2)
-lang.train(tokens1 + tokens2 + tokens3)
-generated = lang.greedy_generate()
-print(generated)
-print(lang.get_perplexity_score(generated))
+lang = lm.LanguageModel(3)
+lang.train(tokens1 + tokens2)
+# Problem with greedy generate???
+# greedy = lang.greedy_generate()
+# print(greedy)
+# print(lang.get_perplexity_score(greedy))
+generated1 = lang.generate()
+# generated2 = lang.generate()
+# check = generated1 + generated2
+# print(check)
+# print(lang.get_perplexity_score(check))
+print(generated1)
+print(lang.get_perplexity_score(generated1))
+beam = lang.beam_generate()
+print(beam)
+print(lang.get_perplexity_score(beam))
+
+#print(lang.p_next(['and', 'do', 'you']))

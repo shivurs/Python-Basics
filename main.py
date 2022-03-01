@@ -17,7 +17,7 @@ Label(root, text=instructions1).grid(row=1, columnspan=2)
 root.selection = ''
 root.to_be_saved = ''
 root.lang = None
-#root.perplexity = []
+root.perplexity = 0
 
 def get_file():
     root.file_path = filedialog.askopenfilenames(title="Select a text file or files", filetypes=[("text files", "*.txt")])
@@ -60,14 +60,12 @@ gen_input.grid(row=12, column=0)
 def generate():
     top = Toplevel()
     top.title("Generated Texts")
-    top.geometry("800x800")
+    #top.geometry("800x800")
     gen = gen_input.get()
     for i in range(int(gen)):
         lines = root.lang.generate()
         Label(top, text=lines, wraplength=750).pack()
         root.to_be_saved += lines
-    
-    root.perplexity = root.lang.get_perplexity_score(root.to_be_saved)
 
     Button(top, text="Save to File", command=save, bg="#caced1").pack()
     Button(top, text="Close Window", command=top.destroy, bg="#caced1").pack()
@@ -78,11 +76,12 @@ def save():
     root.save_file.close()
 
 def perplex():
+    root.perplexity = root.lang.get_perplexity_score(root.to_be_saved)
     Label(root, text=str(root.perplexity)).grid(row=13, column=1)
     
 Button(root, text="Generate Text", command=generate, bg="#caced1").grid(row=12, column=1)
 
-Button(root, text="See Perplexity", command=perplex, bg="#caced1").grid(row=13, column=0)
+Button(root, text="Caclulate Perplexity", command=perplex, bg="#caced1").grid(row=13, column=0)
 
 Button(root, text="Close Program", command=exit, bg="#caced1").grid(row=14, columnspan=2)
 
