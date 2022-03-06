@@ -1,4 +1,3 @@
-from audioop import avg
 import random
 from typing import Dict, List
 import corpus
@@ -418,6 +417,7 @@ class LanguageModel:
         test_tokens = corpus.tokenize(test_text)
         new_tokens = self.replace_unk(test_tokens)
         probs = self.make_probs_list(new_tokens)
+        print(probs)
         score = round(self.calc_perplexity(probs), 2)
         return score
 
