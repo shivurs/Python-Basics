@@ -1,5 +1,6 @@
 from audioop import avg
 import random
+from typing import Dict, List
 import corpus
 import math
 from queue import Queue
@@ -19,11 +20,29 @@ class LanguageModel:
     def train(self, token_sequences): 
         self.token_list = token_sequences
         self.token_counts = self.make_count_dict(token_sequences)
+        token_sequences = self.add_unk_counts(token_sequences, 1)
         self.gram_list = self.make_ngrams(token_sequences)
         self.gram_counts = self.make_count_dict(self.gram_list)
         self.padded_tokens = self.add_padding(token_sequences)
         self.start_words = self.set_start_words()
         self.gram_next = self.get_all_gram_next()
+
+    def add_unk_counts(self, token_sequences, cutoff=1):
+        self.token_counts['UNK'] = 0
+        delete = set()
+        for token in self.token_counts:
+            if token == 'sos' or token == '\n':
+                pass
+            elif self.token_counts[token] <= cutoff:
+                self.token_counts['UNK'] += 1
+                delete.add(token)
+        for i in range(len(token_sequences)):
+            check = token_sequences[i]
+            if check in delete:
+                if check in self.token_counts:
+                    self.token_counts.pop(check)
+                token_sequences[i] = 'UNK'
+        return token_sequences
 
     def get_all_gram_next(self):
         for i in range(len(self.gram_list)-1):
@@ -120,6 +139,8 @@ class LanguageModel:
             gram = tuple(sequence)
             if gram in self.gram_next:
                 return self.gram_next[gram]
+            else:
+                return self.find_gram_next(gram[-1])
 
     def find_gram_next(self, token):
         token_dict = {}
@@ -143,6 +164,8 @@ class LanguageModel:
         self.merge_dict_sum_values(self.start_words, self.get_next(['sos']))
         if '\n' in self.start_words:
             self.start_words.pop('\n')
+        if 'UNK' in self.start_words:
+            self.start_words.pop('UNK')
         for key in self.start_words:
             self.start_words[key] = self.start_words[key] / len(self.start_words)
         return self.start_words
@@ -165,7 +188,7 @@ class LanguageModel:
         """Return a list of n-grams that start with the given token."""
         possible_list = []
         for gram in self.gram_list:
-            if gram[0] == token:
+            if gram[0] == token and 'UNK' not in gram:
                 possible_list.append(gram)
         return possible_list
 
@@ -203,6 +226,8 @@ class LanguageModel:
         line.extend(sample)
         while line[-1] != eos:
             nexttokens = self.p_next(sample)
+            if 'UNK' in nexttokens:
+                nexttokens.pop('UNK')
             if nexttokens == {}:
                 break
             if len(sample) > 1:
@@ -215,7 +240,7 @@ class LanguageModel:
 
     def most_common_word(self):
         """Return the most common token of the text and the quantity."""
-        leave_out = set([',','.','!','\n'])
+        leave_out = set([',', '.', '!', '\n', 'UNK'])
         checked = 0
         for key in self.token_counts:
             if key not in leave_out and self.token_counts[key] > checked:
@@ -245,44 +270,51 @@ class LanguageModel:
         result = f'{most_common} occurs {checked} times.'
         return result
 
-    def add_oov_tokens(self, test_tokens):
-        """Sum quantity of unseen tokens (will equal V in smoothing)."""
-        self.token_counts['UNK'] = 0
-        for token in test_tokens:
-            if token not in set(self.token_list):
-                self.token_counts['UNK'] +=1
+    # def add_oov_tokens(self, test_tokens):
+    #     """Sum quantity of unseen tokens (will equal V in smoothing)."""
+    #     self.token_counts['UNK'] = 0
+    #     for token in test_tokens:
+    #         if token not in set(self.token_list):
+    #             self.token_counts['UNK'] +=1
 
-    def calc_smooth_probs(self, next_dict):
-        """Add one to all counts and divide by unique vocab total."""
-        total = 0
-        if 'UNK' in self.token_counts:
-            v = self.token_counts['UNK']
-            next_dict['UNK'] = 0
-        else:
-            v = 1
-        for key in next_dict:
-            if key in self.token_counts:
-                total += next_dict[key]
-        for key in next_dict:
-            next_dict[key] = (next_dict[key] + 1) / (total + v)
-        return next_dict
+    # def calc_smooth_probs(self, next_dict):
+    #     """Add one to all counts and divide by unique vocab total."""
+    #     total = 0
+    #     if 'UNK' in self.token_counts:
+    #         v = self.token_counts['UNK']
+    #         next_dict['UNK'] = 0
+    #     else:
+    #         v = 1
+    #     for key in next_dict:
+    #         if key in self.token_counts:
+    #             total += next_dict[key]
+    #     for key in next_dict:
+    #         next_dict[key] = (next_dict[key] + 1) / (total + v)
+    #     return next_dict
     
-    def get_smooth_probs(self, test_tokens):
-        probs_list = []
-        sequence = test_tokens[1:self.n +1]
-        prob = 0
-        for i in range(1,len(test_tokens) - self.n):
-            sequence = sequence[-self.n:]
-            next_dict = self.find_next(sequence)
-            probs_dict = self.calc_smooth_probs(next_dict)
-            next = test_tokens[i + self.n]
-            if next in probs_dict:  
-                prob = probs_dict[next]
-            else:
-                prob = probs_dict['UNK']
-            probs_list.append(prob)
-            sequence.append(next)
-        return probs_list
+    # def get_smooth_probs(self, test_tokens):
+    #     probs_list = []
+    #     sequence = test_tokens[1:self.n +1]
+    #     prob = 0
+    #     for i in range(1,len(test_tokens) - self.n):
+    #         sequence = sequence[-self.n:]
+    #         next_dict = self.find_next(sequence)
+    #         probs_dict = self.calc_smooth_probs(next_dict)
+    #         next = test_tokens[i + self.n]
+    #         if next in probs_dict:  
+    #             prob = probs_dict[next]
+    #         else:
+    #             prob = probs_dict['UNK']
+    #         probs_list.append(prob)
+    #         sequence.append(next)
+    #     return probs_list
+
+    # def get_smooth_perplexity(self, test_text):
+    #     test_tokens = corpus.tokenize(test_text)
+    #     self.add_oov_tokens(test_tokens) # 1. store OOV in UNK token # 2. count # of UNKs
+    #     smooth_probs = self.get_smooth_probs(test_tokens) # 3. calc smooth probabilities (V = # UNKs)
+    #     score = self.calc_perplexity(smooth_probs) # 4. calc perplexity        
+    #     return score
 
     def calc_perplexity(self, probs_list):
         """Raise e to the mean of log probabilities from list."""
@@ -302,7 +334,6 @@ class LanguageModel:
         if len(score_list) > 1:
             for i in range(len(score_list)-1):
                 num = score_list[i] + score_list[i+1]
-                print(num)
             avg_score = num / len(score_list)
         else:
             avg_score = score_list[0]
@@ -310,11 +341,11 @@ class LanguageModel:
 
     def get_probs_list(self, new_tokens):
         """Create list of probability lists from p_next dictionaries."""
-        new_tokens.append('\n\n')
+        new_tokens.append('eos')
         all_lists= []
         bookmark = 0
         next = ''
-        while next != '\n\n':
+        while next != 'eos':
             sequence = new_tokens[:self.n +1]
             probs_list = []
             prob = 0
@@ -325,29 +356,81 @@ class LanguageModel:
                 if next == '\n ':
                     next = next[:-1]
                 if probs_dict == None or next not in probs_dict:
-                    break
+                    sequence = sequence[-(self.n - 1):] #backoff
+                    probs_dict = self.p_next(sequence)
+                    if 'UNK' in probs_dict:
+                        prob = probs_dict['UNK']
+                    else:
+                        break
                 elif next in probs_dict:  
                     prob = probs_dict[next]
                 probs_list.append(prob)
                 sequence.append(next)
                 bookmark += 1
+            if probs_list == []:
+                    break    
             all_lists.append(probs_list)
             new_tokens = new_tokens[(bookmark + self.n):]
+        return all_lists
+
+    def make_probs_list(self, new_tokens:List[str]): # version 2
+        new_tokens.append('eos')
+        new_tokens.remove('sos')
+        all_lists= []
+        bookmark = 0
+        nextword = ''
+        while nextword != 'eos':
+            prob = 0
+            probs_list = []
+            get_next = [new_tokens[0]]
+            for i in range(len(new_tokens)):
+                nextword = new_tokens[i+1]
+                if nextword == '\n ':
+                    nextword = nextword[:-1]
+                if nextword == 'eos':
+                    break
+                next_dict = self.p_next(get_next)
+                if nextword not in next_dict:
+                    if 'UNK' in next_dict:
+                        prob = next_dict['UNK']
+                    else:
+                        next_dict = self.p_next([get_next[-1]])     
+                if nextword in next_dict:
+                    prob = next_dict[nextword]
+                elif 'UNK' in next_dict:
+                        prob = next_dict['UNK']
+                elif next_dict == {}:
+                    break
+                get_next.append(nextword)
+                probs_list.append(prob)
+                bookmark += 1
+        all_lists.append(probs_list)
+        new_tokens = new_tokens[(bookmark + self.n):]
         return all_lists
         
     def get_perplexity_score(self, generated):
         new_tokens = corpus.tokenize(generated)
-        probs = self.get_probs_list(new_tokens)
-        print(probs)
-        score = self.calc_perplexity(probs)
+        probs = self.make_probs_list(new_tokens) # changed from get_probs_list
+        score = round(self.calc_perplexity(probs), 2)
         return score
 
-    def get_smooth_perplexity(self, test_text):
+    def get_test_perplexity(self, test_text):
         test_tokens = corpus.tokenize(test_text)
-        self.add_oov_tokens(test_tokens) # 1. store OOV in UNK token # 2. count # of UNKs
-        smooth_probs = self.get_smooth_probs(test_tokens) # 3. calc smooth probabilities (V = # UNKs)
-        score = self.calc_perplexity(smooth_probs) # 4. calc perplexity        
+        new_tokens = self.replace_unk(test_tokens)
+        probs = self.make_probs_list(new_tokens)
+        score = round(self.calc_perplexity(probs), 2)
         return score
+
+    def replace_unk(self, test_tokens):
+        """Replace OOV tokens with 'UNK' tokens."""
+        new_tokens = []
+        check_set = set(self.token_list)
+        for token in test_tokens:
+            if token in check_set:
+                new_tokens.append(token)
+            else:
+                new_tokens.append('UNK')
+        return new_tokens
 
     def get_highest_one(self, dict):
         """Return string with highest probability from the dictionary."""
@@ -368,7 +451,12 @@ class LanguageModel:
         while next not in used and next != eos:
             line.append(next)
             used.add(next)
-            next = self.get_highest_one(self.p_next(line))
+            next_dict = self.p_next(line)
+            if next_dict == None:
+                break
+            if 'UNK' in next_dict:
+                next_dict.pop('UNK')
+            next = self.get_highest_one(next_dict)
         generated = corpus.detokenize(line)
         return generated
 
@@ -380,33 +468,43 @@ class LanguageModel:
         results = []
         while que.qsize() > 0:
             parent = que.get()
+            if parent[-1] in set(results):
+                break
             if parent[-1] == '\n':
                 results.append(corpus.detokenize(parent[:-1]))
                 continue
             # Get the top beam_width priority children.
             children = self.get_children(parent, beam_width)
-            for child in children:
-                que.put(child)
-
-        return results
+            if children == []:
+                results.append(corpus.detokenize(parent))
+                break
+            for child in children: 
+                if child[-1] in parent and child[-2] in parent: 
+                    results.append(corpus.detokenize(parent))
+                    break
+                else:
+                    que.put(child)
+        return results[0] # We only need one result for the output.
 
     def get_children(self, parent, beam_width):
         """Return a list of children of length beam_width from the parent list."""
-        allChildrenDic = self.p_next(parent)
-        # sort to get the top priority beam_width elements
-        sortAllChildrenDic = sorted(allChildrenDic.items(), key=lambda x: x[1], reverse=True)
+        all_child_dict = self.p_next(parent)
+        if 'UNK' in all_child_dict:
+            all_child_dict.pop('UNK')
+        # Sort to get the top priority beam_width elements.
+        sorted_child_dict = sorted(all_child_dict.items(), key=lambda x: x[1], reverse=True)
         
-        sortAllChildren = [tuple[0] for tuple in sortAllChildrenDic]    
-        #sortAllChildren = []
-        #for tuple in sortAllChildrenDic:
-        #    sortAllChildren.append(tuple[0])
+        sorted_child_list = [tuple[0] for tuple in sorted_child_dict]    
+        # sorted_child_list = []
+        # for tuple in sorted_child_dict:
+        #    sorted_child_list.append(tuple[0])
 
         results = []
-        for i in range(0,beam_width):
-            if i>= len(sortAllChildren):
+        for i in range(0, beam_width):
+            if i >= len(sorted_child_list):
                 break
             row = []
             row.extend(parent)
-            row.append(sortAllChildren[i])
+            row.append(sorted_child_list[i])
             results.append(row)
         return results
