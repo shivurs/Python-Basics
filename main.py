@@ -1,15 +1,16 @@
 import corpus
 import lm
 from tkinter import *
-from tkinter import Label, Button, filedialog, messagebox
+from tkinter import Label, Button, filedialog, messagebox, ttk
 
 welcome = "Welcome to Siobhan's Text Generator!" 
 instructions1 = "Please select one or more text files (.txt) you would like to mimic."
 instructions2 = "Please input the length of n-gram you'd like to use."
 instructions3 = "How many texts would you like to generate?"
 info1 = "Note: The generated text could be one word or more."
+info2 = "(Please resize the window to see the Save and Close buttons if they are hidden.)"
 instructions4 = "Upload another text file to calculate its perplexity against the training file(s)."
-info2 = "Note: It will say (Not Responding) while processing Test Perplexity. Please wait."
+info3 = "Note: It might say (Not Responding) while processing Test Perplexity. Please wait."
 
 
 root = Tk()
@@ -66,7 +67,7 @@ def trainlm():
         Label(root, text=most_gram).grid(row=8, columnspan=3)
         Label(root, text=most_word_gram).grid(row=9, columnspan=3)
 
-Button(root, text="Train and Display Info", command=trainlm, bg="#caced1").grid(row=5, column=1)
+Button(root, text="Train and Display Information", command=trainlm, bg="#caced1").grid(row=5, column=1)
 
 Label(root, text=instructions3).grid(row=10, columnspan=3)
 Label(root, text=info1).grid(row=11, columnspan=3)
@@ -79,40 +80,46 @@ def generate():
     top = Toplevel()
     top.title("Generated Texts")
     top.geometry("800x400")
+    Label(top, text=info2).pack()
+
     gen = gen_input.get()
     for i in range(int(gen)):
         lines = root.lang.generate()
         Label(top, text=lines, wraplength=750).pack()
         root.simple_generated += lines
 
-    Button(top, text="Save to File", command=save_simple, bg="#caced1").pack()
-    Button(top, text="Close Window", command=top.destroy, bg="#caced1").pack()
+    Button(top, text="Save to File", command=save_simple, bg="#caced1").pack(pady=10)
+    Button(top, text="Close Window", command=top.destroy, bg="#caced1").pack(pady=10)
 
 def greedy_generate():
     top = Toplevel()
     top.title("Greedy Texts")
     top.geometry("800x400")
+    Label(top, text=info2).pack()
+
     gen = gen_input.get()
     for i in range(int(gen)):
         lines = root.lang.greedy_generate()
         Label(top, text=lines, wraplength=750).pack()
         root.greedy_generated += lines
 
-    Button(top, text="Save to File", command=save_greedy, bg="#caced1").pack()
-    Button(top, text="Close Window", command=top.destroy, bg="#caced1").pack()
+    Button(top, text="Save to File", command=save_greedy, bg="#caced1").pack(pady=10)
+    Button(top, text="Close Window", command=top.destroy, bg="#caced1").pack(pady=10)
 
 def beam_generate():
     top = Toplevel()
     top.title("Beam Texts")
     top.geometry("800x400")
+    Label(top, text=info2).pack()
+
     gen = gen_input.get()
     for i in range(int(gen)):
         lines = root.lang.beam_generate()
         Label(top, text=lines, wraplength=750).pack()
         root.beam_generated += lines
 
-    Button(top, text="Save to File", command=save_beam, bg="#caced1").pack()
-    Button(top, text="Close Window", command=top.destroy, bg="#caced1").pack()
+    Button(top, text="Save to File", command=save_beam, bg="#caced1").pack(pady=10)
+    Button(top, text="Close Window", command=top.destroy, bg="#caced1").pack(pady=10)
 
 # Save functions
 
@@ -152,15 +159,15 @@ def test_perplex():
 
 # Generate Buttons
 
-Button(root, text="Generate Simple Text", command=generate, bg="#caced1").grid(row=13, column=0)
-Button(root, text="Generate Greedy Text", command=greedy_generate, bg="#caced1").grid(row=14, column=0)
-Button(root, text="Generate Beam Text", command=beam_generate, bg="#caced1", width=17).grid(row=15, column=0)
+Button(root, text="Generate Simple Text", command=generate, bg="#caced1").grid(row=13, column=0, pady=10)
+Button(root, text="Generate Greedy Text", command=greedy_generate, bg="#caced1").grid(row=14, column=0, pady=10)
+Button(root, text="Generate Beam Text", command=beam_generate, bg="#caced1", width=17).grid(row=15, column=0, pady=10)
 
 # Perplexity Buttons
 
-Button(root, text="Caclulate Simple Perplexity", command=simple_perplex, bg="#caced1").grid(row=13, column=1)
-Button(root, text="Caclulate Greedy Perplexity", command=greedy_perplex, bg="#caced1").grid(row=14, column=1)
-Button(root, text="Caclulate Beam Perplexity", command=beam_perplex, bg="#caced1", width=21).grid(row=15, column=1)
+Button(root, text="Caclulate Simple Perplexity", command=simple_perplex, bg="#caced1").grid(row=13, column=1, pady=10)
+Button(root, text="Caclulate Greedy Perplexity", command=greedy_perplex, bg="#caced1").grid(row=14, column=1, pady=10)
+Button(root, text="Caclulate Beam Perplexity", command=beam_perplex, bg="#caced1", width=21).grid(row=15, column=1, pady=10)
 
 # Test Text Tools
 
@@ -178,7 +185,7 @@ def get_file():
 
 Button(root, text="Browse", command=get_file, bg="#caced1").grid(row=17, column=0)
 
-Label(root, text=info2).grid(row=18, columnspan=3)
+Label(root, text=info3).grid(row=18, columnspan=3)
 
 Button(root, text="Caclulate Test Perplexity", command=test_perplex, bg="#caced1").grid(row=19, column=0)
 

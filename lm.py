@@ -17,12 +17,11 @@ class LanguageModel:
         self.gram_next = {}
 
     def train(self, token_sequences): 
-        self.token_list = token_sequences
         self.token_counts = self.make_count_dict(token_sequences)
-        token_sequences = self.add_unk_counts(token_sequences, 1)
-        self.gram_list = self.make_ngrams(token_sequences)
+        self.token_list = self.add_unk_counts(token_sequences, 1)
+        self.gram_list = self.make_ngrams(self.token_list)
         self.gram_counts = self.make_count_dict(self.gram_list)
-        self.padded_tokens = self.add_padding(token_sequences)
+        self.padded_tokens = self.add_padding(self.token_list)
         self.start_words = self.set_start_words()
         self.gram_next = self.get_all_gram_next()
         # Sort gram_list by last key for binary search.
@@ -435,7 +434,10 @@ class LanguageModel:
                     break
                 else:
                     que.put(child)
-        return results[0] # Only one result is needed.
+        if beam_width == 1:
+            return results[0]
+        else:
+            return results
 
     def get_children(self, parent, beam_width):
         """Return a list of children of length beam_width from the parent list."""
