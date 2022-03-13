@@ -20,5 +20,5 @@ train_tokens = corpus.tokenize(train_text)
 lang = lm.LanguageModel(3)
 lang.train(train_tokens)
 
-print(lang.get_test_perplexity(test_text)) 
+print(lang.get_test_perplexity(test_text))
 

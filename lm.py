@@ -25,6 +25,21 @@ class LanguageModel:
         self.padded_tokens = self.add_padding(token_sequences)
         self.start_words = self.set_start_words()
         self.gram_next = self.get_all_gram_next()
+        # Sort gram_list by last key for binary search.
+        self.gram_list.sort(key=lambda x:(x[-1]))
+        # Make a dictionary with the last token as keys to reuse.
+        self.gram_next_merge_end: dict = self.makeGramNextMergeWithEnd()
+   
+    def makeGramNextMergeWithEnd(self):
+        """Return a dictionary where keys are final token of ngrams, 
+        values are dictionaries of next words and probabilities.
+        """
+        res = dict()
+        for key in self.gram_next:
+            if key[-1] not in res:
+                res[key[-1]] = dict()
+            res[key[-1]] = self.merge_dict_sum_values(res[key[-1]], self.gram_next[key])
+        return res
 
     def add_unk_counts(self, token_sequences, cutoff=1):
         self.token_counts['UNK'] = 0
@@ -123,7 +138,7 @@ class LanguageModel:
             next_dict[key] = next_dict[key] / total
         return next_dict
 
-    def p_next(self, tokens):
+    def p_next(self, tokens=[]):
         """Return a dict of tokens and their probability of appearance in the text.
         Takes a list of strings as the argument.
         """
@@ -142,10 +157,10 @@ class LanguageModel:
                 return self.find_gram_next(gram[-1])
 
     def find_gram_next(self, token):
-        token_dict = {}
-        for key in self.gram_next:
-            if key[-1] == token:
-                token_dict = self.merge_dict_sum_values(token_dict, self.gram_next[key])
+        """Return a dictionary of tokens that appear after the ngram
+        including their probabilities.
+        """
+        token_dict = self.gram_next_merge_end[token]
         result = self.calc_probs(token_dict)        
         return result
 
@@ -183,7 +198,7 @@ class LanguageModel:
         startword = start[0]
         return startword
 
-    def find_gram(self, token):
+    def find_gram_start(self, token):
         """Return a list of n-grams that start with the given token."""
         possible_list = []
         for gram in self.gram_list:
@@ -191,31 +206,46 @@ class LanguageModel:
                 possible_list.append(gram)
         return possible_list
 
+
     def find_gram_end(self, token):
         """Return a list of n-grams that end with the given token."""
-        possible_list = []
-        for gram in self.gram_list:
-            if gram[-1] == token:
-                possible_list.append(gram)
-        return possible_list
+        possibleList = []
+        left = 0
+        right = len(self.gram_list)-1
+        idx = -1
+        while left < right:
+            mid = (int)((left+right)/2)
+            if self.gram_list[mid][-1] == token:
+                idx = mid
+                break
+            elif self.gram_list[mid][-1] > token:
+                right = mid
+            else :
+                left = mid+1
+        if idx < 0:
+            return []
+        
+        possibleList.append(self.gram_list[idx])
+        leftIdx = idx - 1
+        rightIdx = idx + 1
+        while leftIdx >= 0 and self.gram_list[idx][-1] == self.gram_list[leftIdx][-1]:
+            possibleList.append(self.gram_list[leftIdx])
+            leftIdx -= 1
+        while rightIdx < len(self.gram_list) and self.gram_list[idx][-1] == self.gram_list[rightIdx][-1]:
+            possibleList.append(self.gram_list[rightIdx])
+            rightIdx += 1
+        return possibleList
     
     def generate(self):
         """Create a string that is added to until \n is encountered."""
         eos = '\n'
         line = [self.get_sample_start()]
-        possible = self.find_gram(line[0])
+        possible = self.find_gram_start(line[0])
         choice = random.sample(possible, 1)
         sample = list(sum(choice,())) # Flatten choice into list of strings
         line = self.append_next(eos, sample)
         result = corpus.detokenize(line)
         return result
-
-    def make_copy(self, reference):
-        """Returns a new object with the same values but different reference."""
-        copy = []
-        for element in reference:
-            copy.append(element)
-        return copy
 
     def append_next(self, eos, sample):
         """Add words to list until eos is encountered or the dict is empty.
@@ -249,11 +279,12 @@ class LanguageModel:
         return result
 
     def most_common_word_gram(self):
+        """Return the common ngram starting with the common word."""
         most_common = ()
         checked = 0
         for gram in self.gram_counts:
             if self.common_word == gram[0] and self.gram_counts[gram] > checked:
-                checked = checked = self.gram_counts[gram]
+                checked = self.gram_counts[gram]
                 most_common = gram
         result = f'{most_common} occurs {checked} times.'
         return result
@@ -268,52 +299,6 @@ class LanguageModel:
                 most_common = key
         result = f'{most_common} occurs {checked} times.'
         return result
-
-    # def add_oov_tokens(self, test_tokens):
-    #     """Sum quantity of unseen tokens (will equal V in smoothing)."""
-    #     self.token_counts['UNK'] = 0
-    #     for token in test_tokens:
-    #         if token not in set(self.token_list):
-    #             self.token_counts['UNK'] +=1
-
-    # def calc_smooth_probs(self, next_dict):
-    #     """Add one to all counts and divide by unique vocab total."""
-    #     total = 0
-    #     if 'UNK' in self.token_counts:
-    #         v = self.token_counts['UNK']
-    #         next_dict['UNK'] = 0
-    #     else:
-    #         v = 1
-    #     for key in next_dict:
-    #         if key in self.token_counts:
-    #             total += next_dict[key]
-    #     for key in next_dict:
-    #         next_dict[key] = (next_dict[key] + 1) / (total + v)
-    #     return next_dict
-    
-    # def get_smooth_probs(self, test_tokens):
-    #     probs_list = []
-    #     sequence = test_tokens[1:self.n +1]
-    #     prob = 0
-    #     for i in range(1,len(test_tokens) - self.n):
-    #         sequence = sequence[-self.n:]
-    #         next_dict = self.find_next(sequence)
-    #         probs_dict = self.calc_smooth_probs(next_dict)
-    #         next = test_tokens[i + self.n]
-    #         if next in probs_dict:  
-    #             prob = probs_dict[next]
-    #         else:
-    #             prob = probs_dict['UNK']
-    #         probs_list.append(prob)
-    #         sequence.append(next)
-    #     return probs_list
-
-    # def get_smooth_perplexity(self, test_text):
-    #     test_tokens = corpus.tokenize(test_text)
-    #     self.add_oov_tokens(test_tokens) # 1. store OOV in UNK token # 2. count # of UNKs
-    #     smooth_probs = self.get_smooth_probs(test_tokens) # 3. calc smooth probabilities (V = # UNKs)
-    #     score = self.calc_perplexity(smooth_probs) # 4. calc perplexity        
-    #     return score
 
     def calc_perplexity(self, probs_list):
         """Raise e to the mean of log probabilities from list."""
@@ -338,41 +323,8 @@ class LanguageModel:
             avg_score = score_list[0]
         return avg_score 
 
-    def get_probs_list(self, new_tokens):
-        """Create list of probability lists from p_next dictionaries."""
-        new_tokens.append('eos')
-        all_lists= []
-        bookmark = 0
-        next = ''
-        while next != 'eos':
-            sequence = new_tokens[:self.n +1]
-            probs_list = []
-            prob = 0
-            for i in range(1,len(new_tokens) - self.n):
-                sequence = sequence[-self.n:]
-                probs_dict = self.p_next(sequence)
-                next = new_tokens[i + self.n]
-                if next == '\n ':
-                    next = next[:-1]
-                if probs_dict == None or next not in probs_dict:
-                    sequence = sequence[-(self.n - 1):] #backoff
-                    probs_dict = self.p_next(sequence)
-                    if 'UNK' in probs_dict:
-                        prob = probs_dict['UNK']
-                    else:
-                        break
-                elif next in probs_dict:  
-                    prob = probs_dict[next]
-                probs_list.append(prob)
-                sequence.append(next)
-                bookmark += 1
-            if probs_list == []:
-                    break    
-            all_lists.append(probs_list)
-            new_tokens = new_tokens[(bookmark + self.n):]
-        return all_lists
-
-    def make_probs_list(self, new_tokens:List[str]): # version 2
+    def make_probs_list(self, new_tokens):
+        """Take a list of strings and return a list of probabilities."""
         new_tokens.append('eos')
         new_tokens.remove('sos')
         all_lists= []
@@ -409,7 +361,7 @@ class LanguageModel:
         
     def get_perplexity_score(self, generated):
         new_tokens = corpus.tokenize(generated)
-        probs = self.make_probs_list(new_tokens) # changed from get_probs_list
+        probs = self.make_probs_list(new_tokens)
         score = round(self.calc_perplexity(probs), 2)
         return score
 
@@ -417,7 +369,6 @@ class LanguageModel:
         test_tokens = corpus.tokenize(test_text)
         new_tokens = self.replace_unk(test_tokens)
         probs = self.make_probs_list(new_tokens)
-        print(probs)
         score = round(self.calc_perplexity(probs), 2)
         return score
 
@@ -460,7 +411,7 @@ class LanguageModel:
         generated = corpus.detokenize(line)
         return generated
 
-    def beam_generate(self, beam_width=2):
+    def beam_generate(self, beam_width=1):
         """Generate sequences following the most probable beam_width paths."""
         startword = self.get_sample_start()
         que = Queue()
@@ -484,7 +435,7 @@ class LanguageModel:
                     break
                 else:
                     que.put(child)
-        return results[0] # We only need one result for the output.
+        return results[0] # Only one result is needed.
 
     def get_children(self, parent, beam_width):
         """Return a list of children of length beam_width from the parent list."""
@@ -494,10 +445,7 @@ class LanguageModel:
         # Sort to get the top priority beam_width elements.
         sorted_child_dict = sorted(all_child_dict.items(), key=lambda x: x[1], reverse=True)
         
-        sorted_child_list = [tuple[0] for tuple in sorted_child_dict]    
-        # sorted_child_list = []
-        # for tuple in sorted_child_dict:
-        #    sorted_child_list.append(tuple[0])
+        sorted_child_list = [tuple[0] for tuple in sorted_child_dict]
 
         results = []
         for i in range(0, beam_width):
